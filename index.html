@@ -12,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <style>
-        /* [PREVIOUS CSS STAYS THE SAME - I'll add login modal CSS] */
         * {
             margin: 0;
             padding: 0;
@@ -30,14 +29,790 @@
             --shadow: rgba(0, 0, 0, 0.1);
         }
 
-        /* Login Modal Styles */
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #e8dcc8 0%, #f4f1e8 50%, #dfd5c3 100%);
+            color: var(--ink-dark);
+            line-height: 1.8;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .book-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--accent-green), #7a9b79);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 3em;
+            color: var(--parchment);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .subtitle {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9em;
+            color: var(--parchment);
+            opacity: 0.9;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin-top: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gold);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .chapter {
+            background: white;
+            padding: 50px;
+            margin-bottom: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px var(--shadow);
+            border-left: 5px solid var(--accent-green);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chapter.locked {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: blur(2px);
+        }
+
+        h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 2em;
+            color: var(--accent-green);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-gold);
+        }
+
+        h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.5em;
+            color: var(--ink-medium);
+            margin: 30px 0 15px;
+        }
+
+        .story-text {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            text-align: justify;
+            line-height: 2;
+        }
+
+        .story-text::first-letter {
+            font-size: 3em;
+            font-weight: bold;
+            float: left;
+            line-height: 1;
+            margin: 5px 10px 0 0;
+            color: var(--accent-green);
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 4px solid var(--accent-green);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            font-family: 'Space Mono', monospace;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .formula {
+            font-size: 1.3em;
+            text-align: center;
+            margin: 15px 0;
+            color: var(--ink-dark);
+            font-weight: bold;
+        }
+
+        .calculation-area {
+            background: #fafbfc;
+            border: 2px dashed var(--ink-medium);
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            color: var(--ink-medium);
+            min-width: 200px;
+        }
+
+        input[type="number"] {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-family: 'Space Mono', monospace;
+            border: 2px solid var(--ink-medium);
+            border-radius: 8px;
+            width: 150px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(90, 124, 89, 0.1);
+        }
+
+        input.correct {
+            border-color: var(--success-green);
+            background: rgba(61, 139, 61, 0.05);
+        }
+
+        input.incorrect {
+            border-color: var(--warning-red);
+            background: rgba(196, 69, 54, 0.05);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .unit {
+            font-family: 'Space Mono', monospace;
+            color: var(--ink-medium);
+            font-size: 1.1em;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--accent-green), #4a6f49);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-family: 'Merriweather', serif;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(90, 124, 89, 0.3);
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(90, 124, 89, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .climactic-question {
+            background: linear-gradient(135deg, #fff8dc, #fffaed);
+            border: 3px solid var(--accent-gold);
+            padding: 35px;
+            margin: 40px 0;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+            position: relative;
+        }
+
+        .climactic-question::before {
+            content: '⚡';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            background: var(--accent-gold);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .climactic-question h3 {
+            color: var(--accent-gold);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+            color: var(--ink-dark);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid var(--ink-medium);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            background: rgba(90, 124, 89, 0.05);
+            border-color: var(--accent-green);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: rgba(90, 124, 89, 0.1);
+            border-color: var(--accent-green);
+            border-width: 3px;
+        }
+
+        .option.correct-answer {
+            background: rgba(61, 139, 61, 0.1);
+            border-color: var(--success-green);
+            border-width: 3px;
+        }
+
+        .option.wrong-answer {
+            background: rgba(196, 69, 54, 0.1);
+            border-color: var(--warning-red);
+            border-width: 3px;
+        }
+
+        .feedback {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            text-align: center;
+            font-weight: 600;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: rgba(61, 139, 61, 0.1);
+            border: 2px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .feedback.error {
+            background: rgba(196, 69, 54, 0.1);
+            border: 2px solid var(--warning-red);
+            color: var(--warning-red);
+        }
+
+        .hint-toggle {
+            background: var(--accent-gold);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.95em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            font-family: 'Merriweather', serif;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .hint-toggle:hover {
+            background: #c9a82e;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .hint-content {
+            display: none;
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 4px solid var(--accent-gold);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-style: italic;
+            color: var(--ink-medium);
+        }
+
+        .hint-content.visible {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        .attempt-tracker {
+            display: inline-block;
+            background: rgba(196, 69, 54, 0.1);
+            color: var(--warning-red);
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-left: 10px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .calculated-values {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8f4);
+            border: 2px solid var(--success-green);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-family: 'Space Mono', monospace;
+            box-shadow: 0 4px 15px rgba(61, 139, 61, 0.1);
+        }
+
+        .calculated-values h4 {
+            font-family: 'Merriweather', serif;
+            color: var(--success-green);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calculated-values h4::before {
+            content: '✓';
+            background: var(--success-green);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .value-item {
+            margin: 10px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid var(--success-green);
+            padding-left: 15px;
+            animation: slideIn 0.4s ease;
+        }
+
+        .value-item .label {
+            color: var(--ink-medium);
+            font-size: 0.95em;
+        }
+
+        .value-item .value {
+            color: var(--success-green);
+            font-weight: bold;
+            font-size: 1.15em;
+            margin-left: 10px;
+        }
+
+        .bonus-section {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8f4);
+            border: 2px solid var(--success-green);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, var(--accent-gold), #c9a82e);
+            border-radius: 20px;
+            color: white;
+            margin-top: 40px;
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
+        }
+
+        .completion-message h2 {
+            color: white;
+            border: none;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        /* What-If Exploration Styles */
+        .outcome-display {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 8px 30px var(--shadow);
+            border-left: 5px solid var(--accent-green);
+        }
+
+        .outcome-display h3 {
+            margin-top: 0;
+            color: var(--accent-green);
+        }
+
+        .outcome-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.4s ease;
+        }
+
+        .outcome-text.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid var(--success-green);
+        }
+
+        .outcome-text.failure {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid var(--warning-red);
+        }
+
+        .outcome-text.close {
+            background: linear-gradient(135deg, #fff3cd, #ffeeba);
+            color: #856404;
+            border: 3px solid var(--accent-gold);
+        }
+
+        .outcome-comparison {
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .time-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .time-label {
+            font-family: 'Merriweather', serif;
+            color: var(--ink-medium);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .time-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+
+        .progress-comparison {
+            margin-top: 30px;
+        }
+
+        .race-bar {
+            width: 100%;
+            height: 50px;
+            background: #e9ecef;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .race-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease, background 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            position: relative;
+        }
+
+        .jack-bar {
+            background: linear-gradient(90deg, var(--accent-green), #7a9b79);
+            box-shadow: 0 0 15px rgba(90, 124, 89, 0.5);
+        }
+
+        .giant-bar {
+            background: linear-gradient(90deg, var(--warning-red), #d66056);
+            box-shadow: 0 0 15px rgba(196, 69, 54, 0.5);
+        }
+
+        .bar-label {
+            color: white;
+            font-weight: bold;
+            font-family: 'Space Mono', monospace;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .sliders-container {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .slider-group {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .slider-header label {
+            font-family: 'Merriweather', serif;
+            font-size: 1.1em;
+            color: var(--ink-dark);
+            min-width: auto;
+        }
+
+        .slider-value {
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            color: var(--accent-green);
+            font-size: 1.1em;
+        }
+
+        .custom-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(90, 124, 89, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .custom-slider::-webkit-slider-thumb:hover {
+            background: #4a6f49;
+            transform: scale(1.2);
+        }
+
+        .custom-slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(90, 124, 89, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .custom-slider::-moz-range-thumb:hover {
+            background: #4a6f49;
+            transform: scale(1.2);
+        }
+
+        .slider-range {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85em;
+            color: var(--ink-medium);
+        }
+
+        .challenge-section {
+            background: linear-gradient(135deg, #f0f8ff, #e8f4f8);
+            padding: 35px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid #3498db;
+        }
+
+        .challenge-section h3 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+
+        .challenge-list {
+            margin-top: 25px;
+        }
+
+        .challenge-item {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .challenge-number {
+            background: #3498db;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .challenge-text {
+            flex: 1;
+            min-width: 200px;
+            font-size: 1.05em;
+        }
+
+        .challenge-input {
+            padding: 10px 15px;
+            font-family: 'Space Mono', monospace;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            width: 120px;
+            font-size: 1em;
+        }
+
+        .challenge-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            font-size: 0.95em;
+        }
+
+        .challenge-feedback {
+            width: 100%;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .challenge-feedback.correct {
+            color: var(--success-green);
+        }
+
+        .challenge-feedback.incorrect {
+            color: var(--warning-red);
+        }
+
+        
+        /* ========================================
+           FIREBASE LOGIN & USER INTERFACE STYLES
+           ======================================== */
+        
         .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,12 +827,25 @@
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .login-modal h2 {
             font-family: 'Merriweather', serif;
             color: var(--accent-green);
             margin-bottom: 20px;
+            font-size: 2em;
         }
 
         .login-modal p {
@@ -65,6 +853,7 @@
             font-size: 1.2em;
             margin-bottom: 30px;
             color: var(--ink-dark);
+            line-height: 1.6;
         }
 
         .google-signin-btn {
@@ -85,6 +874,7 @@
         .google-signin-btn:hover {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             transform: translateY(-2px);
+            border-color: #4285F4;
         }
 
         .google-icon {
@@ -111,11 +901,16 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            border: 2px solid var(--accent-green);
         }
 
         .user-name {
             font-weight: bold;
             color: var(--accent-green);
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .logout-btn {
@@ -127,10 +922,12 @@
             font-size: 0.9em;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-family: 'Space Mono', monospace;
         }
 
         .logout-btn:hover {
             background: #a33a2c;
+            transform: scale(1.05);
         }
 
         .teacher-dashboard-link {
@@ -154,25 +951,52 @@
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
 
-        /* Copy all other styles from the previous version */
-        body {
-            font-family: 'Crimson Text', serif;
-            background: linear-gradient(135deg, #e8dcc8 0%, #f4f1e8 50%, #dfd5c3 100%);
-            color: var(--ink-dark);
-            line-height: 1.8;
-            min-height: 100vh;
-            background-attachment: fixed;
-        }
+        @media (max-width: 768px) {
+            .chapter {
+                padding: 30px 20px;
+            }
 
-        .book-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+            h1 {
+                font-size: 2em;
+            }
 
-        /* [Include all the CSS from the previous version here - I'm condensing for space] */
-        /* This is a placeholder - in the actual file, all styles would be included */
-        
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            label {
+                min-width: auto;
+            }
+
+            input[type="number"] {
+                width: 100%;
+            }
+
+            .outcome-comparison {
+                flex-direction: column;
+            }
+
+            .challenge-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .challenge-input {
+                width: 100%;
+            }
+            
+            .user-info {
+                top: 10px;
+                right: 10px;
+                padding: 10px 15px;
+                font-size: 0.85em;
+            }
+            
+            .user-name {
+                max-width: 100px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -209,8 +1033,6 @@
     </a>
 
     <div class="book-container" id="mainContent" style="display: none;">
-        <!-- [ALL THE CHAPTER CONTENT FROM PREVIOUS VERSION GOES HERE] -->
-        <!-- I'm condensing this for the response, but the full HTML would be included -->
         <header>
             <h1>Narrative Physics</h1>
             <div class="subtitle">CLASSIC TALES WITH A TWIST</div>
@@ -219,28 +1041,604 @@
             </div>
         </header>
 
-        <!-- Chapters 1-7 would all be here exactly as before -->
-        <p style="text-align: center; padding: 100px; color: var(--ink-medium);">
-            [Full module content would be inserted here - same as narrative-physics-improved.html]
-        </p>
-    </div>
+        <!-- Chapter 1: Introduction & Background -->
+        <section class="chapter" id="chapter1">
+            <h2>Jack and the Beanstalk</h2>
+            <div class="story-text">
+                Once upon a time there lived a poor widow and her son Jack. One day, Jack's mother told him to sell their only cow. Jack went to the market and on the way he met a man who wanted to buy his cow. Jack asked, "What will you give me in return for my cow?" The man answered, "I will give you five magic beans!" Jack took the magic beans and gave the man the cow. But when he reached home, Jack's mother was very angry. She threw the beans out of the window. Jack was very sad and went to sleep without dinner.
+            </div>
+            <div class="story-text">
+                The next day, when Jack woke up in the morning and looked out of the window, he saw that a mile high beanstalk had grown from his magic beans! He climbed up the beanstalk and reached a kingdom in the sky where a giant and his wife lived.
+            </div>
+
+            <h3>Background Knowledge: The Physics of Motion</h3>
+            <div class="formula-box">
+                <div><strong>Velocity</strong> tells us how fast something moves and in what direction.</div>
+                <div class="formula">v = x / t</div>
+                <div style="margin-top: 10px;">Where: <strong>v</strong> = velocity (m/s), <strong>x</strong> = displacement (m), <strong>t</strong> = time (s)</div>
+                
+                <div style="margin-top: 25px;"><strong>Rearranged Forms:</strong></div>
+                <div class="formula">x = v · t</div>
+                <div style="text-align: center; margin: 5px 0;">(displacement = velocity × time)</div>
+                <div class="formula">t = x / v</div>
+                <div style="text-align: center; margin: 5px 0;">(time = displacement ÷ velocity)</div>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: var(--accent-green); margin-bottom: 10px;">Unit Conversion Reference:</h4>
+                <div style="font-family: 'Space Mono', monospace; font-size: 0.95em;">
+                    <div style="margin: 8px 0;">• 1 mile = 1609.34 meters</div>
+                    <div style="margin: 8px 0;">• 1 hour = 3600 seconds</div>
+                    <div style="margin: 8px 0;">• To convert mph to m/s: multiply by 1609.34, then divide by 3600</div>
+                </div>
+            </div>
+
+            <button onclick="unlockChapter(2)">Continue to the Escape →</button>
+        </section>
+
+        <!-- Chapter 2: Story Continues to Climactic Question -->
+        <section class="chapter locked" id="chapter2">
+            <h2>The Great Escape</h2>
+            <div class="story-text">
+                After stealing the giant's magical harp, Jack glided down the beanstalk as fast as he could and reached home. The giant woke up and saw Jack with the harp. Furious, he ran after Jack, following him down the beanstalk covering three meters every second.
+            </div>
+            <div class="story-text">
+                When Jack reached the bottom, the Giant still had one-hundred and seventy-five more meters to climb before reaching the bottom. Quickly, with some stamina left, Jack turned and sprinted to his house at an eleven miles per hour pace, which was another hundred meters away from the beanstalk. After grabbing the axe, Jack turned and jogged back at a slower eight miles per hour pace. When he reached the base of the beanstalk he took a second to catch his breath and then he began to chop. In five seconds flat the beanstalk was cut all the way through.
+            </div>
+
+            <!-- CLIMACTIC QUESTION FIRST -->
+            <div class="climactic-question">
+                <h3>⚡ CLIMACTIC QUESTION ⚡</h3>
+                <div class="question-text">
+                    Did Jack cut down the beanstalk in time to avoid the Giant?
+                </div>
+                <div style="text-align: center; margin: 25px 0; font-style: italic; color: var(--ink-medium);">
+                    To answer this question, you'll need to solve the physics problems below!
+                </div>
+            </div>
+
+            <h3>Let's Solve This Together</h3>
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                To determine if Jack escaped in time, we need to compare two things:
+            </p>
+            <ol style="font-size: 1.1em; margin-left: 40px; line-height: 2;">
+                <li>How long it takes the Giant to climb down to the ground</li>
+                <li>How long it takes Jack to run to his house, grab the axe, run back, and chop down the beanstalk</li>
+            </ol>
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                Let's calculate each one step by step!
+            </p>
+
+            <button onclick="startCalculations()">Start Calculating →</button>
+        </section>
+
+        <!-- Chapter 3: Calculations -->
+        <section class="chapter locked" id="chapter3">
+            <h2>Problem 1: The Giant's Descent</h2>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4 style="color: var(--accent-green); margin-bottom: 15px;">📖 Reading Comprehension: Find the Information</h4>
+                <p style="font-size: 1.05em; line-height: 1.8;">
+                    Look back at the story above. Can you find and identify:
+                </p>
+                <ul style="margin: 15px 0 15px 30px; line-height: 2;">
+                    <li>How fast is the Giant climbing down? (velocity)</li>
+                    <li>How far does the Giant need to travel? (distance/displacement)</li>
+                </ul>
+                <p style="font-size: 1.05em; margin-top: 15px; font-style: italic; color: var(--ink-medium);">
+                    Once you've found these values, use them in the calculation below.
+                </p>
+            </div>
+
+            <h3>Calculate: How long until the Giant reaches the ground?</h3>
+            
+            <div class="formula-box">
+                <div style="margin-bottom: 15px;">We need to find <strong>time</strong>, and we know <strong>distance</strong> and <strong>velocity</strong>.</div>
+                <div>Which formula should we use?</div>
+                <div class="formula">t = x / v</div>
+            </div>
+
+            <div class="calculation-area" id="problem1" style="display: none;">
+                <div class="input-group">
+                    <label>Giant's velocity (v<sub>G</sub>):</label>
+                    <input type="number" id="giantVelocity" step="0.01" placeholder="From story">
+                    <span class="unit">m/s</span>
+                </div>
+                <div class="input-group">
+                    <label>Distance to ground (x<sub>G</sub>):</label>
+                    <input type="number" id="giantDistance" step="0.01" placeholder="From story">
+                    <span class="unit">m</span>
+                </div>
+                <div class="input-group">
+                    <label>Time to ground (t<sub>G</sub>):</label>
+                    <input type="number" id="giantTime" step="0.01" placeholder="Calculate">
+                    <span class="unit">s</span>
+                    <button onclick="checkGiantTime()">Check Answer</button>
+                    <span id="giantAttempts" class="attempt-tracker" style="display: none;"></span>
+                </div>
+                
+                <button class="hint-toggle" id="giantHintBtn" onclick="toggleHint('giantHint')" style="display: none;">💡 Need a Hint?</button>
+                <div id="giantHint" class="hint-content">
+                    Remember: t = x / v<br>
+                    You're dividing the distance (175 m) by the velocity (3 m/s)
+                </div>
+                
+                <div id="giantFeedback"></div>
+            </div>
+
+            <!-- Calculated Values Box -->
+            <div id="calculatedValues" class="calculated-values" style="display: none;">
+                <h4>Calculated Information</h4>
+                <div id="calculatedList"></div>
+            </div>
+
+            <button id="continueToProblem2" style="display: none;" onclick="unlockChapter(4)">Continue to Problem 2 →</button>
+        </section>
+
+        <!-- Chapter 4: Jack's Journey -->
+        <section class="chapter locked" id="chapter4">
+            <h2>Problem 2: Jack's Race Against Time</h2>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4 style="color: var(--accent-green); margin-bottom: 15px;">📖 Reading Comprehension: Find the Information</h4>
+                <p style="font-size: 1.05em; line-height: 1.8;">
+                    Go back and re-read the story. Find these details about Jack's journey:
+                </p>
+                <ul style="margin: 15px 0 15px 30px; line-height: 2;">
+                    <li>How fast did Jack sprint to his house?</li>
+                    <li>How far away was his house?</li>
+                    <li>How fast did Jack jog back?</li>
+                    <li>How long did Jack rest?</li>
+                    <li>How long did it take to chop the beanstalk?</li>
+                </ul>
+            </div>
+
+            <h3>Step 1: Convert Jack's Speeds to m/s</h3>
+            <div class="formula-box">
+                <div>Speed to house: 11 mph</div>
+                <div class="formula">11 mph × (1609.34 m / 1 mile) × (1 hour / 3600 s) = ?</div>
+            </div>
+
+            <div class="calculation-area">
+                <div class="input-group">
+                    <label>Jack's sprint speed (v<sub>J1</sub>):</label>
+                    <input type="number" id="jackSpeed1" step="0.01" placeholder="Convert">
+                    <span class="unit">m/s</span>
+                    <button onclick="checkJackSpeed1()">Check</button>
+                    <span id="speed1Attempts" class="attempt-tracker" style="display: none;"></span>
+                </div>
+                
+                <button class="hint-toggle" id="speed1HintBtn" onclick="toggleHint('speed1Hint')" style="display: none;">💡 Need a Hint?</button>
+                <div id="speed1Hint" class="hint-content">
+                    11 × 1609.34 = 17,702.74<br>
+                    17,702.74 ÷ 3600 = ?
+                </div>
+                
+                <div id="speed1Feedback"></div>
+            </div>
+
+            <div id="step2Jack" style="display: none;">
+                <div class="formula-box">
+                    <div>Speed back: 8 mph</div>
+                    <div class="formula">8 mph × (1609.34 m / 1 mile) × (1 hour / 3600 s) = ?</div>
+                </div>
+
+                <div class="calculation-area">
+                    <div class="input-group">
+                        <label>Jack's jog speed (v<sub>J2</sub>):</label>
+                        <input type="number" id="jackSpeed2" step="0.01" placeholder="Convert">
+                        <span class="unit">m/s</span>
+                        <button onclick="checkJackSpeed2()">Check</button>
+                        <span id="speed2Attempts" class="attempt-tracker" style="display: none;"></span>
+                    </div>
+                    
+                    <button class="hint-toggle" id="speed2HintBtn" onclick="toggleHint('speed2Hint')" style="display: none;">💡 Need a Hint?</button>
+                    <div id="speed2Hint" class="hint-content">
+                        8 × 1609.34 = 12,874.72<br>
+                        12,874.72 ÷ 3600 = ?
+                    </div>
+                    
+                    <div id="speed2Feedback"></div>
+                </div>
+            </div>
+
+            <div id="step3Jack" style="display: none;">
+                <h3>Step 2: Calculate Times</h3>
+                
+                <div class="calculation-area">
+                    <div class="input-group">
+                        <label>Distance to house (x<sub>house</sub>):</label>
+                        <input type="number" id="houseDistance" step="0.01" placeholder="From story">
+                        <span class="unit">m</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Time to house (t<sub>J1</sub>):</label>
+                        <input type="number" id="timeToHouse" step="0.01" placeholder="x / v">
+                        <span class="unit">s</span>
+                        <button onclick="checkTimeToHouse()">Check</button>
+                        <span id="time1Attempts" class="attempt-tracker" style="display: none;"></span>
+                    </div>
+                    
+                    <button class="hint-toggle" id="time1HintBtn" onclick="toggleHint('time1Hint')" style="display: none;">💡 Need a Hint?</button>
+                    <div id="time1Hint" class="hint-content">
+                        Use: t = x / v<br>
+                        t = 100 / 4.92
+                    </div>
+                    
+                    <div id="time1Feedback"></div>
+                </div>
+            </div>
+
+            <div id="step4Jack" style="display: none;">
+                <div class="calculation-area">
+                    <div class="input-group">
+                        <label>Time back to beanstalk (t<sub>J2</sub>):</label>
+                        <input type="number" id="timeBack" step="0.01" placeholder="x / v">
+                        <span class="unit">s</span>
+                        <button onclick="checkTimeBack()">Check</button>
+                        <span id="time2Attempts" class="attempt-tracker" style="display: none;"></span>
+                    </div>
+                    
+                    <button class="hint-toggle" id="time2HintBtn" onclick="toggleHint('time2Hint')" style="display: none;">💡 Need a Hint?</button>
+                    <div id="time2Hint" class="hint-content">
+                        Use: t = x / v<br>
+                        t = 100 / 3.58
+                    </div>
+                    
+                    <div id="time2Feedback"></div>
+                </div>
+            </div>
+
+            <div id="step5Jack" style="display: none;">
+                <h3>Step 3: Calculate Total Time</h3>
+                <div class="formula-box">
+                    <div class="formula">t<sub>J total</sub> = t<sub>J1</sub> + t<sub>J2</sub> + t<sub>rest</sub> + t<sub>chop</sub></div>
+                </div>
+                
+                <div class="calculation-area">
+                    <div class="input-group">
+                        <label>Rest time (t<sub>rest</sub>):</label>
+                        <input type="number" id="restTime" step="0.01" placeholder="From story">
+                        <span class="unit">s</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Chop time (t<sub>chop</sub>):</label>
+                        <input type="number" id="chopTime" step="0.01" placeholder="From story">
+                        <span class="unit">s</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Total time (t<sub>J total</sub>):</label>
+                        <input type="number" id="totalTime" step="0.01" placeholder="Add all times">
+                        <span class="unit">s</span>
+                        <button onclick="checkTotalTime()">Check</button>
+                        <span id="totalAttempts" class="attempt-tracker" style="display: none;"></span>
+                    </div>
+                    
+                    <button class="hint-toggle" id="totalHintBtn" onclick="toggleHint('totalHint')" style="display: none;">💡 Need a Hint?</button>
+                    <div id="totalHint" class="hint-content">
+                        Add: time to house + time back + 1 second rest + 5 seconds chopping
+                    </div>
+                    
+                    <div id="totalFeedback"></div>
+                </div>
+            </div>
+
+            <!-- Updated Calculated Values -->
+            <div id="calculatedValues2" class="calculated-values" style="display: none;">
+                <h4>Calculated Information</h4>
+                <div id="calculatedList2"></div>
+            </div>
+
+            <button id="continueToAnswer" style="display: none;" onclick="unlockChapter(5)">Answer the Climactic Question →</button>
+        </section>
+
+        <!-- Chapter 5: Answer Climactic Question -->
+        <section class="chapter locked" id="chapter5">
+            <h2>The Moment of Truth</h2>
+            
+            <div class="calculated-values">
+                <h4>Your Calculated Information</h4>
+                <div id="finalCalculatedList"></div>
+            </div>
+
+            <div class="climactic-question">
+                <h3>⚡ CLIMACTIC QUESTION ⚡</h3>
+                <div class="question-text">
+                    Did Jack cut down the beanstalk in time to avoid the Giant?
+                </div>
+                <div style="margin: 20px 0; padding: 20px; background: white; border-radius: 8px;">
+                    <p style="font-size: 1.1em; text-align: left;">
+                        <strong>Compare the times:</strong><br>
+                        • Giant's time to reach ground: <span id="displayGiantTime" style="color: var(--warning-red); font-weight: bold;"></span> seconds<br>
+                        • Jack's total time: <span id="displayJackTime" style="color: var(--accent-green); font-weight: bold;"></span> seconds
+                    </p>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(this, 'yes')">
+                        ✓ YES - Jack cut it down before the Giant reached the ground!
+                    </div>
+                    <div class="option" onclick="selectOption(this, 'no')">
+                        ✗ NO - The Giant reached the ground before Jack could finish!
+                    </div>
+                </div>
+                <button id="submitAnswer" style="display: none;" onclick="checkClimacticAnswer()">Submit Answer</button>
+                <div id="climacticFeedback"></div>
+            </div>
+        </section>
+
+        <!-- Chapter 6: Bonus -->
+        <section class="chapter locked" id="chapter6">
+            <div class="bonus-section">
+                <h2>🌟 Bonus Challenge</h2>
+                <div class="story-text">
+                    How far up the beanstalk was the Giant when Jack finished cutting it down?
+                </div>
+
+                <div class="formula-box">
+                    <div>First, find how far the Giant climbed down during Jack's time:</div>
+                    <div class="formula">x<sub>Gc</sub> = v<sub>G</sub> · t<sub>J</sub></div>
+                    <div style="margin-top: 15px;">Then, subtract from the starting distance:</div>
+                    <div class="formula">x<sub>Gg</sub> = x<sub>G</sub> - x<sub>Gc</sub></div>
+                </div>
+
+                <div class="calculation-area">
+                    <div class="input-group">
+                        <label>Distance Giant climbed (x<sub>Gc</sub>):</label>
+                        <input type="number" id="distanceClimbed" step="0.01" placeholder="v × t">
+                        <span class="unit">m</span>
+                        <button onclick="checkDistanceClimbed()">Check</button>
+                        <span id="bonusAttempts1" class="attempt-tracker" style="display: none;"></span>
+                    </div>
+                    
+                    <button class="hint-toggle" id="bonus1HintBtn" onclick="toggleHint('bonus1Hint')" style="display: none;">💡 Need a Hint?</button>
+                    <div id="bonus1Hint" class="hint-content">
+                        Multiply the Giant's velocity (3 m/s) by Jack's total time
+                    </div>
+                    
+                    <div id="bonus1Feedback"></div>
+                </div>
+
+                <div id="bonusStep2" style="display: none;">
+                    <div class="calculation-area">
+                        <div class="input-group">
+                            <label>Giant's height when cut (x<sub>Gg</sub>):</label>
+                            <input type="number" id="finalHeight" step="0.01" placeholder="175 - x">
+                            <span class="unit">m</span>
+                            <button onclick="checkFinalHeight()">Check</button>
+                            <span id="bonusAttempts2" class="attempt-tracker" style="display: none;"></span>
+                        </div>
+                        
+                        <button class="hint-toggle" id="bonus2HintBtn" onclick="toggleHint('bonus2Hint')" style="display: none;">💡 Need a Hint?</button>
+                        <div id="bonus2Hint" class="hint-content">
+                            Subtract the distance climbed from 175 meters
+                        </div>
+                        
+                        <div id="bonus2Feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="completionMessage" style="display: none;" class="completion-message">
+                <h2>🎉 Congratulations! 🎉</h2>
+                <p style="font-size: 1.3em; margin: 20px 0;">You've successfully completed the Jack and the Beanstalk physics module!</p>
+                <p style="font-size: 1.1em;">Jack is safe, the beanstalk is down, and you've mastered velocity, time, and distance calculations.</p>
+                <div style="margin-top: 30px; font-size: 1.2em;">
+                    <strong>Skills Learned:</strong><br>
+                    ✓ Reading comprehension for scientific information<br>
+                    ✓ Unit conversions (mph to m/s)<br>
+                    ✓ Velocity formula applications<br>
+                    ✓ Multi-step problem solving<br>
+                    ✓ Critical thinking and comparison
+                </div>
+                <button onclick="unlockChapter(7)" style="margin-top: 30px; background: linear-gradient(135deg, #9b59b6, #8e44ad); font-size: 1.2em; padding: 20px 50px;">
+                    🔬 Continue to What-If Exploration →
+                </button>
+            </div>
+        </section>
+
+        <!-- Chapter 7: What-If Exploration -->
+        <section class="chapter locked" id="chapter7">
+            <h2>🔬 What If? - Explore Different Outcomes</h2>
+            
+            <div style="background: linear-gradient(135deg, #e8f4f8, #f0f8ff); padding: 30px; border-radius: 15px; margin: 20px 0; border: 2px solid #3498db;">
+                <h3 style="color: #2980b9; margin-top: 0;">Become the Story Engineer!</h3>
+                <p style="font-size: 1.15em; line-height: 1.8;">
+                    Now that you've solved the original story, let's explore what would happen if things were different. 
+                    Use the sliders below to change the story variables and see how the outcome changes in real-time!
+                </p>
+            </div>
+
+            <!-- Outcome Display -->
+            <div id="outcomeDisplay" class="outcome-display">
+                <h3>Current Outcome:</h3>
+                <div id="outcomeText" class="outcome-text"></div>
+                <div class="outcome-comparison">
+                    <div class="time-display">
+                        <div class="time-label">Jack's Time:</div>
+                        <div id="jackTimeDisplay" class="time-value">54.26 s</div>
+                    </div>
+                    <div class="time-display">
+                        <div class="time-label">Giant's Time:</div>
+                        <div id="giantTimeDisplay" class="time-value">58.33 s</div>
+                    </div>
+                    <div class="time-display">
+                        <div class="time-label">Difference:</div>
+                        <div id="differenceDisplay" class="time-value">+4.07 s</div>
+                    </div>
+                </div>
+                <div class="progress-comparison">
+                    <div style="margin-bottom: 10px; font-weight: bold; color: var(--accent-green);">Jack's Progress:</div>
+                    <div class="race-bar">
+                        <div id="jackProgressBar" class="race-bar-fill jack-bar" style="width: 93%;">
+                            <span class="bar-label">Jack</span>
+                        </div>
+                    </div>
+                    <div style="margin: 15px 0 10px 0; font-weight: bold; color: var(--warning-red);">Giant's Progress:</div>
+                    <div class="race-bar">
+                        <div id="giantProgressBar" class="race-bar-fill giant-bar" style="width: 100%;">
+                            <span class="bar-label">Giant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Sliders -->
+            <div class="sliders-container">
+                <h3>Adjust the Variables:</h3>
+                
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>🏃 Jack's Sprint Speed to House:</label>
+                        <span id="sprintValue" class="slider-value">11 mph (4.92 m/s)</span>
+                    </div>
+                    <input type="range" id="sprintSlider" min="5" max="20" step="0.5" value="11" class="custom-slider">
+                    <div class="slider-range">
+                        <span>5 mph</span>
+                        <span>20 mph</span>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>🚶 Jack's Jog Speed Back:</label>
+                        <span id="jogValue" class="slider-value">8 mph (3.58 m/s)</span>
+                    </div>
+                    <input type="range" id="jogSlider" min="3" max="15" step="0.5" value="8" class="custom-slider">
+                    <div class="slider-range">
+                        <span>3 mph</span>
+                        <span>15 mph</span>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>📏 Distance to House:</label>
+                        <span id="distanceValue" class="slider-value">100 m</span>
+                    </div>
+                    <input type="range" id="distanceSlider" min="50" max="200" step="5" value="100" class="custom-slider">
+                    <div class="slider-range">
+                        <span>50 m</span>
+                        <span>200 m</span>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>⏱️ Rest Time:</label>
+                        <span id="restValue" class="slider-value">1 s</span>
+                    </div>
+                    <input type="range" id="restSlider" min="0" max="10" step="0.5" value="1" class="custom-slider">
+                    <div class="slider-range">
+                        <span>0 s</span>
+                        <span>10 s</span>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>🪓 Chopping Time:</label>
+                        <span id="chopValue" class="slider-value">5 s</span>
+                    </div>
+                    <input type="range" id="chopSlider" min="1" max="15" step="0.5" value="5" class="custom-slider">
+                    <div class="slider-range">
+                        <span>1 s</span>
+                        <span>15 s</span>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>🏔️ Giant's Climbing Speed:</label>
+                        <span id="giantSpeedValue" class="slider-value">3 m/s</span>
+                    </div>
+                    <input type="range" id="giantSpeedSlider" min="1" max="6" step="0.1" value="3" class="custom-slider">
+                    <div class="slider-range">
+                        <span>1 m/s</span>
+                        <span>6 m/s</span>
+                    </div>
+                </div>
+
+                <button onclick="resetToOriginal()" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); margin-top: 20px;">
+                    ↺ Reset to Original Story
+                </button>
+            </div>
+
+            <!-- Challenge Questions -->
+            <div class="challenge-section">
+                <h3>🎯 Challenge Questions:</h3>
+                <div class="challenge-list">
+                    <div class="challenge-item">
+                        <div class="challenge-number">1</div>
+                        <div class="challenge-text">
+                            <strong>Find the Minimum:</strong> What's the SLOWEST sprint speed Jack can have and still escape? 
+                            (Keep all other values at original)
+                        </div>
+                        <input type="number" id="challenge1" step="0.1" placeholder="? mph" class="challenge-input">
+                        <button onclick="checkChallenge1()" class="challenge-btn">Check</button>
+                        <div id="challenge1Feedback" class="challenge-feedback"></div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="challenge-number">2</div>
+                        <div class="challenge-text">
+                            <strong>Maximum Distance:</strong> What's the FARTHEST Jack's house can be and he still escapes?
+                            (Keep all other values at original)
+                        </div>
+                        <input type="number" id="challenge2" step="1" placeholder="? meters" class="challenge-input">
+                        <button onclick="checkChallenge2()" class="challenge-btn">Check</button>
+                        <div id="challenge2Feedback" class="challenge-feedback"></div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="challenge-number">3</div>
+                        <div class="challenge-text">
+                            <strong>Time Budget:</strong> How many TOTAL seconds can Jack waste (rest + chop combined) and still survive?
+                            (Keep all other values at original)
+                        </div>
+                        <input type="number" id="challenge3" step="0.1" placeholder="? seconds" class="challenge-input">
+                        <button onclick="checkChallenge3()" class="challenge-btn">Check</button>
+                        <div id="challenge3Feedback" class="challenge-feedback"></div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="challenge-number">4</div>
+                        <div class="challenge-text">
+                            <strong>Perfect Timing:</strong> Adjust ANY variables to make Jack escape by EXACTLY 1 second. 
+                            Take a screenshot when you achieve it!
+                        </div>
+                        <div id="challenge4Feedback" class="challenge-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reflection Section -->
+            <div style="background: linear-gradient(135deg, #fff8dc, #fffaed); padding: 30px; border-radius: 15px; margin-top: 40px; border: 2px solid var(--accent-gold);">
+                <h3 style="color: var(--accent-gold);">💭 Reflection Questions:</h3>
+                <ul style="font-size: 1.1em; line-height: 2; margin-left: 20px;">
+                    <li>Which variable has the BIGGEST impact on the outcome? Why?</li>
+                    <li>What happens if the Giant is twice as fast? Can Jack still win?</li>
+                    <li>In real life, which variables would be easiest for Jack to control?</li>
+                    <li>How does this relate to planning and time management in your own life?</li>
+                </ul>
+            </div>
+        </section>
+    </div><!-- End mainContent -->
 
     <script>
         // ============================================
-        // FIREBASE CONFIGURATION
+        // FIREBASE CONFIGURATION & AUTHENTICATION
         // ============================================
         
-        // TODO: Replace with your Firebase config
-        // Get this from Firebase Console > Project Settings > Your Apps
-       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-	const firebaseConfig = {
- 		 apiKey: "AIzaSyDYWEi36hIOYw7q3g3O0pvrVQdDwWuBuos",
- 		 authDomain: "narrative-physics.firebaseapp.com",
- 		 projectId: "narrative-physics",
-		  storageBucket: "narrative-physics.firebasestorage.app",
-		  messagingSenderId: "30892764542",
-		  appId: "1:30892764542:web:72c85e63ed6582a71b572f",
-		  measurementId: "G-6THETC7B1C"
+        // TODO: Replace with your Firebase config from Firebase Console
+        const firebaseConfig = {
+ 	 		apiKey: "AIzaSyDYWEi36hIOYw7q3g3O0pvrVQdDwWuBuos",
+ 			authDomain: "narrative-physics.firebaseapp.com",
+  			projectId: "narrative-physics",
+ 			storageBucket: "narrative-physics.firebasestorage.app",
+ 	 		messagingSenderId: "30892764542",
+ 	 		appId: "1:30892764542:web:72c85e63ed6582a71b572f",
+ 	 		measurementId: "G-6THETC7B1C"
 	};
 
         // Initialize Firebase
@@ -270,7 +1668,7 @@
         };
 
         // ============================================
-        // AUTHENTICATION
+        // AUTHENTICATION FUNCTIONS
         // ============================================
 
         function signInWithGoogle() {
@@ -286,12 +1684,11 @@
                 })
                 .catch((error) => {
                     console.error('Sign-in error:', error);
-                    alert('Sign-in failed. Please try again or contact your teacher.');
+                    alert('Sign-in failed. Please use your school Google account or contact your teacher.');
                 });
         }
 
         function signOut() {
-            // Save final progress before logging out
             saveProgressToFirebase();
             
             auth.signOut().then(() => {
@@ -299,6 +1696,7 @@
                 document.getElementById('mainContent').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('teacherDashboardLink').style.display = 'none';
+                currentUser = null;
             });
         }
 
@@ -311,8 +1709,8 @@
             document.getElementById('userInfo').style.display = 'flex';
             
             // Display user info
-            document.getElementById('userName').textContent = user.displayName || user.email;
-            document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/40';
+            document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+            document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + (user.displayName || user.email);
             
             // Check if teacher
             if (TEACHER_EMAILS.includes(user.email)) {
@@ -323,7 +1721,7 @@
             studentProgress.userId = user.uid;
             studentProgress.email = user.email;
             studentProgress.displayName = user.displayName;
-            studentProgress.startTime = new Date().toISOString();
+            studentProgress.startTime = studentProgress.startTime || new Date().toISOString();
             
             // Load existing progress from Firebase
             loadProgressFromFirebase();
@@ -346,13 +1744,12 @@
             studentProgress.lastUpdated = new Date().toISOString();
             studentProgress.totalTimeSpent = calculateTimeSpent();
             
-            // Save to Firebase Realtime Database
             database.ref('students/' + currentUser.uid).set(studentProgress)
                 .then(() => {
-                    console.log('Progress saved successfully');
+                    console.log('Progress saved');
                 })
                 .catch((error) => {
-                    console.error('Error saving progress:', error);
+                    console.error('Error saving:', error);
                 });
         }
 
@@ -363,28 +1760,24 @@
                 .then((snapshot) => {
                     const data = snapshot.val();
                     if (data) {
-                        // Restore progress
                         studentProgress = data;
                         restoreStudentProgress();
                     }
                 })
                 .catch((error) => {
-                    console.error('Error loading progress:', error);
+                    console.error('Error loading:', error);
                 });
         }
 
         function restoreStudentProgress() {
-            // Unlock completed chapters
             studentProgress.completedChapters.forEach(chapterNum => {
                 const chapter = document.getElementById('chapter' + chapterNum);
                 if (chapter) chapter.classList.remove('locked');
             });
             
-            // Restore calculated values
             calculatedValues = studentProgress.calculatedValues || {};
             updateCalculatedDisplay();
             
-            // Update progress bar
             const progressPercent = (studentProgress.currentChapter / 7) * 100;
             updateProgress(progressPercent);
         }
@@ -393,64 +1786,662 @@
             if (!studentProgress.startTime) return 0;
             const start = new Date(studentProgress.startTime);
             const now = new Date();
-            return Math.floor((now - start) / 1000); // seconds
-        }
-
-        // ============================================
-        // TRACKING FUNCTIONS (Hook into existing code)
-        // ============================================
-
-        // Override the existing unlockChapter function
-        const originalUnlockChapter = unlockChapter;
-        function unlockChapter(chapterNum) {
-            originalUnlockChapter(chapterNum);
-            
-            // Track progress
-            if (!studentProgress.completedChapters.includes(chapterNum - 1) && chapterNum > 1) {
-                studentProgress.completedChapters.push(chapterNum - 1);
-            }
-            studentProgress.currentChapter = chapterNum;
-            saveProgressToFirebase();
-        }
-
-        // Override addToCalculated to track values
-        const originalAddToCalculated = addToCalculated;
-        function addToCalculated(label, value, unit) {
-            originalAddToCalculated(label, value, unit);
-            
-            studentProgress.calculatedValues[label] = { value, unit };
-            saveProgressToFirebase();
-        }
-
-        // Track challenge completions
-        function trackChallengeCompletion(challengeNum) {
-            if (!studentProgress.challengesCompleted.includes(challengeNum)) {
-                studentProgress.challengesCompleted.push(challengeNum);
-                saveProgressToFirebase();
-            }
+            return Math.floor((now - start) / 1000);
         }
 
         // Save progress every 30 seconds
         setInterval(() => {
-            if (currentUser) {
-                saveProgressToFirebase();
-            }
+            if (currentUser) saveProgressToFirebase();
         }, 30000);
 
-        // Save progress before page unload
+        // Save before page unload
         window.addEventListener('beforeunload', () => {
-            if (currentUser) {
-                saveProgressToFirebase();
-            }
+            if (currentUser) saveProgressToFirebase();
         });
 
         // ============================================
-        // ALL EXISTING JAVASCRIPT FROM PREVIOUS VERSION
+        // ORIGINAL MODULE JAVASCRIPT (WITH TRACKING)
         // ============================================
-        // [All the calculation functions, slider logic, etc. would be here]
-        // I'm condensing this for the response
         
-        console.log('Firebase-enabled Narrative Physics loaded');
+        // Tracking student progress
+        let selectedAnswer = null;
+        let calculatedValues = {};
+        let attempts = {};
+
+        // Correct answers
+        const ANSWERS = {
+            giantVelocity: 3,
+            giantDistance: 175,
+            giantTime: 58.33,
+            jackSpeed1: 4.92,
+            jackSpeed2: 3.58,
+            houseDistance: 100,
+            timeToHouse: 20.33,
+            timeBack: 27.93,
+            restTime: 1,
+            chopTime: 5,
+            totalTime: 54.26,
+            distanceClimbed: 162.78,
+            finalHeight: 12.22
+        };
+
+        function trackAttempt(field) {
+            if (!attempts[field]) attempts[field] = 0;
+            attempts[field]++;
+            return attempts[field];
+        }
+
+        function showHintAfterAttempts(field, hintBtnId, attemptSpanId) {
+            const attemptCount = trackAttempt(field);
+            const attemptSpan = document.getElementById(attemptSpanId);
+            if (attemptSpan) {
+                attemptSpan.textContent = `Attempt ${attemptCount}`;
+                attemptSpan.style.display = 'inline-block';
+            }
+            
+            if (attemptCount >= 2) {
+                const hintBtn = document.getElementById(hintBtnId);
+                if (hintBtn) hintBtn.style.display = 'block';
+            }
+        }
+
+        function toggleHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('visible');
+        }
+
+        function addToCalculated(label, value, unit) {
+            calculatedValues[label] = { value, unit };
+            updateCalculatedDisplay();
+            
+            // Track in Firebase
+            studentProgress.calculatedValues = calculatedValues;
+            if (currentUser) saveProgressToFirebase();
+        }
+
+        function updateCalculatedDisplay() {
+            const displays = ['calculatedList', 'calculatedList2', 'finalCalculatedList'];
+            const html = Object.entries(calculatedValues).map(([label, data]) => 
+                `<div class="value-item">
+                    <span class="label">${label}:</span>
+                    <span class="value">${data.value} ${data.unit}</span>
+                </div>`
+            ).join('');
+            
+            displays.forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem) elem.innerHTML = html;
+            });
+            
+            // Show calculated values boxes
+            const boxes = ['calculatedValues', 'calculatedValues2'];
+            boxes.forEach(id => {
+                const box = document.getElementById(id);
+                if (box && Object.keys(calculatedValues).length > 0) {
+                    box.style.display = 'block';
+                }
+            });
+        }
+
+        function checkValue(inputId, correctValue, tolerance, feedbackId, successCallback, attemptSpanId, hintBtnId) {
+            const input = document.getElementById(inputId);
+            const value = parseFloat(input.value);
+            const feedback = document.getElementById(feedbackId);
+
+            if (Math.abs(value - correctValue) < tolerance) {
+                input.classList.add('correct');
+                input.classList.remove('incorrect');
+                input.disabled = true;
+                if (successCallback) successCallback(value);
+                return true;
+            } else {
+                input.classList.add('incorrect');
+                input.classList.remove('correct');
+                showHintAfterAttempts(inputId, hintBtnId, attemptSpanId);
+                return false;
+            }
+        }
+
+        function checkGiantTime() {
+            const velocity = parseFloat(document.getElementById('giantVelocity').value);
+            const distance = parseFloat(document.getElementById('giantDistance').value);
+            const time = parseFloat(document.getElementById('giantTime').value);
+            const feedback = document.getElementById('giantFeedback');
+
+            // Check if they found the values from the story correctly
+            if (Math.abs(velocity - ANSWERS.giantVelocity) > 0.1) {
+                feedback.innerHTML = '<div class="feedback error">✗ Check the Giant\'s velocity in the story. How many meters per second?</div>';
+                document.getElementById('giantVelocity').classList.add('incorrect');
+                showHintAfterAttempts('giantVelocity', 'giantHintBtn', 'giantAttempts');
+                return;
+            }
+            document.getElementById('giantVelocity').classList.add('correct');
+
+            if (Math.abs(distance - ANSWERS.giantDistance) > 0.1) {
+                feedback.innerHTML = '<div class="feedback error">✗ Check the distance the Giant needs to travel. How many meters?</div>';
+                document.getElementById('giantDistance').classList.add('incorrect');
+                showHintAfterAttempts('giantDistance', 'giantHintBtn', 'giantAttempts');
+                return;
+            }
+            document.getElementById('giantDistance').classList.add('correct');
+
+            if (Math.abs(time - ANSWERS.giantTime) < 0.5) {
+                document.getElementById('giantTime').classList.add('correct');
+                document.getElementById('giantTime').disabled = true;
+                feedback.innerHTML = '<div class="feedback success">✓ Excellent! The Giant needs 58.33 seconds to reach the ground.</div>';
+                
+                addToCalculated('Giant\'s velocity', velocity, 'm/s');
+                addToCalculated('Giant\'s distance', distance, 'm');
+                addToCalculated('Giant\'s time to ground', time.toFixed(2), 's');
+                
+                document.getElementById('continueToProblem2').style.display = 'block';
+                updateProgress(30);
+            } else {
+                document.getElementById('giantTime').classList.add('incorrect');
+                feedback.innerHTML = '<div class="feedback error">✗ Not quite. Use the formula: t = x / v</div>';
+                showHintAfterAttempts('giantTime', 'giantHintBtn', 'giantAttempts');
+            }
+        }
+
+        function checkJackSpeed1() {
+            const success = checkValue('jackSpeed1', ANSWERS.jackSpeed1, 0.1, 'speed1Feedback',
+                (value) => {
+                    document.getElementById('speed1Feedback').innerHTML = 
+                        '<div class="feedback success">✓ Correct! 11 mph = 4.92 m/s</div>';
+                    addToCalculated('Jack\'s sprint speed', value.toFixed(2), 'm/s');
+                    setTimeout(() => {
+                        document.getElementById('step2Jack').style.display = 'block';
+                        document.getElementById('step2Jack').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }, 'speed1Attempts', 'speed1HintBtn');
+            
+            if (!success) {
+                document.getElementById('speed1Feedback').innerHTML = 
+                    '<div class="feedback error">✗ Try again. Multiply 11 by 1609.34, then divide by 3600</div>';
+            }
+        }
+
+        function checkJackSpeed2() {
+            const success = checkValue('jackSpeed2', ANSWERS.jackSpeed2, 0.1, 'speed2Feedback',
+                (value) => {
+                    document.getElementById('speed2Feedback').innerHTML = 
+                        '<div class="feedback success">✓ Correct! 8 mph = 3.58 m/s</div>';
+                    addToCalculated('Jack\'s jog speed', value.toFixed(2), 'm/s');
+                    setTimeout(() => {
+                        document.getElementById('step3Jack').style.display = 'block';
+                        document.getElementById('step3Jack').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }, 'speed2Attempts', 'speed2HintBtn');
+            
+            if (!success) {
+                document.getElementById('speed2Feedback').innerHTML = 
+                    '<div class="feedback error">✗ Try again. Multiply 8 by 1609.34, then divide by 3600</div>';
+            }
+        }
+
+        function checkTimeToHouse() {
+            const distance = parseFloat(document.getElementById('houseDistance').value);
+            const time = parseFloat(document.getElementById('timeToHouse').value);
+            const feedback = document.getElementById('time1Feedback');
+
+            if (Math.abs(distance - ANSWERS.houseDistance) > 0.1) {
+                feedback.innerHTML = '<div class="feedback error">✗ Check the story for the distance to the house.</div>';
+                document.getElementById('houseDistance').classList.add('incorrect');
+                showHintAfterAttempts('houseDistance', 'time1HintBtn', 'time1Attempts');
+                return;
+            }
+            document.getElementById('houseDistance').classList.add('correct');
+
+            if (Math.abs(time - ANSWERS.timeToHouse) < 0.5) {
+                document.getElementById('timeToHouse').classList.add('correct');
+                document.getElementById('timeToHouse').disabled = true;
+                feedback.innerHTML = '<div class="feedback success">✓ Perfect! It took Jack 20.33 seconds to reach his house.</div>';
+                
+                addToCalculated('Distance to house', distance, 'm');
+                addToCalculated('Time to house', time.toFixed(2), 's');
+                
+                setTimeout(() => {
+                    document.getElementById('step4Jack').style.display = 'block';
+                    document.getElementById('step4Jack').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+            } else {
+                document.getElementById('timeToHouse').classList.add('incorrect');
+                feedback.innerHTML = '<div class="feedback error">✗ Use: t = x / v. Divide 100 by Jack\'s sprint speed (4.92 m/s)</div>';
+                showHintAfterAttempts('timeToHouse', 'time1HintBtn', 'time1Attempts');
+            }
+        }
+
+        function checkTimeBack() {
+            const time = parseFloat(document.getElementById('timeBack').value);
+            const feedback = document.getElementById('time2Feedback');
+
+            if (Math.abs(time - ANSWERS.timeBack) < 0.5) {
+                document.getElementById('timeBack').classList.add('correct');
+                document.getElementById('timeBack').disabled = true;
+                feedback.innerHTML = '<div class="feedback success">✓ Great! It took Jack 27.93 seconds to jog back.</div>';
+                
+                addToCalculated('Time back to beanstalk', time.toFixed(2), 's');
+                
+                setTimeout(() => {
+                    document.getElementById('step5Jack').style.display = 'block';
+                    document.getElementById('step5Jack').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+            } else {
+                document.getElementById('timeBack').classList.add('incorrect');
+                feedback.innerHTML = '<div class="feedback error">✗ Use: t = x / v. Divide 100 by Jack\'s jog speed (3.58 m/s)</div>';
+                showHintAfterAttempts('timeBack', 'time2HintBtn', 'time2Attempts');
+            }
+        }
+
+        function checkTotalTime() {
+            const rest = parseFloat(document.getElementById('restTime').value);
+            const chop = parseFloat(document.getElementById('chopTime').value);
+            const total = parseFloat(document.getElementById('totalTime').value);
+            const feedback = document.getElementById('totalFeedback');
+
+            if (Math.abs(rest - ANSWERS.restTime) > 0.1) {
+                feedback.innerHTML = '<div class="feedback error">✗ Check the story for how long Jack rested.</div>';
+                document.getElementById('restTime').classList.add('incorrect');
+                showHintAfterAttempts('restTime', 'totalHintBtn', 'totalAttempts');
+                return;
+            }
+            document.getElementById('restTime').classList.add('correct');
+
+            if (Math.abs(chop - ANSWERS.chopTime) > 0.1) {
+                feedback.innerHTML = '<div class="feedback error">✗ Check the story for how long it took to chop the beanstalk.</div>';
+                document.getElementById('chopTime').classList.add('incorrect');
+                showHintAfterAttempts('chopTime', 'totalHintBtn', 'totalAttempts');
+                return;
+            }
+            document.getElementById('chopTime').classList.add('correct');
+
+            if (Math.abs(total - ANSWERS.totalTime) < 0.5) {
+                document.getElementById('totalTime').classList.add('correct');
+                document.getElementById('totalTime').disabled = true;
+                feedback.innerHTML = '<div class="feedback success">✓ Perfect! Jack\'s total time was 54.26 seconds!</div>';
+                
+                addToCalculated('Rest time', rest, 's');
+                addToCalculated('Chop time', chop, 's');
+                addToCalculated('Jack\'s TOTAL time', total.toFixed(2), 's');
+                
+                document.getElementById('continueToAnswer').style.display = 'block';
+                updateProgress(60);
+            } else {
+                document.getElementById('totalTime').classList.add('incorrect');
+                feedback.innerHTML = '<div class="feedback error">✗ Add all four times: to house + back + rest + chop</div>';
+                showHintAfterAttempts('totalTime', 'totalHintBtn', 'totalAttempts');
+            }
+        }
+
+        function selectOption(element, answer) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedAnswer = answer;
+            document.getElementById('submitAnswer').style.display = 'block';
+        }
+
+        function checkClimacticAnswer() {
+            const feedback = document.getElementById('climacticFeedback');
+            const options = document.querySelectorAll('.option');
+
+            if (selectedAnswer === 'yes') {
+                options[0].classList.add('correct-answer');
+                options[1].classList.remove('selected');
+                feedback.innerHTML = '<div class="feedback success">✓ YES! Jack\'s total time (54.26s) is LESS than the Giant\'s time (58.33s). Jack cut down the beanstalk with about 4 seconds to spare! The Giant fell from the sky and was never seen again. The kingdom was safe!</div>';
+                setTimeout(() => {
+                    unlockChapter(6);
+                }, 2000);
+                updateProgress(80);
+            } else {
+                options[1].classList.add('wrong-answer');
+                feedback.innerHTML = '<div class="feedback error">✗ Look at the numbers again! Jack needed 54.26 seconds, but the Giant needed 58.33 seconds. Who was faster?</div>';
+                selectedAnswer = null;
+                setTimeout(() => {
+                    options[1].classList.remove('wrong-answer');
+                    options[1].classList.remove('selected');
+                    document.getElementById('submitAnswer').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function checkDistanceClimbed() {
+            const distance = parseFloat(document.getElementById('distanceClimbed').value);
+            const feedback = document.getElementById('bonus1Feedback');
+
+            if (Math.abs(distance - ANSWERS.distanceClimbed) < 1) {
+                document.getElementById('distanceClimbed').classList.add('correct');
+                document.getElementById('distanceClimbed').disabled = true;
+                feedback.innerHTML = '<div class="feedback success">✓ Correct! The Giant climbed down 162.78 meters.</div>';
+                
+                setTimeout(() => {
+                    document.getElementById('bonusStep2').style.display = 'block';
+                }, 500);
+            } else {
+                document.getElementById('distanceClimbed').classList.add('incorrect');
+                feedback.innerHTML = '<div class="feedback error">✗ Multiply velocity (3 m/s) by time (54.26 s)</div>';
+                showHintAfterAttempts('distanceClimbed', 'bonus1HintBtn', 'bonusAttempts1');
+            }
+        }
+
+        function checkFinalHeight() {
+            const height = parseFloat(document.getElementById('finalHeight').value);
+            const feedback = document.getElementById('bonus2Feedback');
+
+            if (Math.abs(height - ANSWERS.finalHeight) < 1) {
+                document.getElementById('finalHeight').classList.add('correct');
+                document.getElementById('finalHeight').disabled = true;
+                feedback.innerHTML = '<div class="feedback success">✓ Outstanding! The Giant was still 12.22 meters (about 40 feet) above the ground when the beanstalk was cut. That\'s quite a fall!</div>';
+                
+                setTimeout(() => {
+                    document.getElementById('completionMessage').style.display = 'block';
+                    document.getElementById('completionMessage').scrollIntoView({ behavior: 'smooth' });
+                }, 1000);
+                updateProgress(100);
+            } else {
+                document.getElementById('finalHeight').classList.add('incorrect');
+                feedback.innerHTML = '<div class="feedback error">✗ Subtract distance climbed (162.78 m) from starting distance (175 m)</div>';
+                showHintAfterAttempts('finalHeight', 'bonus2HintBtn', 'bonusAttempts2');
+            }
+        }
+
+        function unlockSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.style.display = 'block';
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+
+        function startCalculations() {
+            // Unlock Chapter 3
+            const chapter3 = document.getElementById('chapter3');
+            if (chapter3) {
+                chapter3.classList.remove('locked');
+                // Small delay to let the unlock animation start
+                setTimeout(() => {
+                    chapter3.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                // Show the problem1 section after scrolling
+                setTimeout(() => {
+                    const problem1 = document.getElementById('problem1');
+                    if (problem1) {
+                        problem1.style.display = 'block';
+                        setTimeout(() => {
+                            problem1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 200);
+                    }
+                }, 700);
+                
+                updateProgress(20);
+            }
+        }
+
+        function unlockChapter(chapterNum) {
+            const chapter = document.getElementById('chapter' + chapterNum);
+            chapter.classList.remove('locked');
+            chapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Track progress in Firebase
+            if (!studentProgress.completedChapters.includes(chapterNum - 1) && chapterNum > 1) {
+                studentProgress.completedChapters.push(chapterNum - 1);
+            }
+            studentProgress.currentChapter = chapterNum;
+            if (currentUser) saveProgressToFirebase();
+            
+            // Update displayed times for final question
+            if (chapterNum === 5) {
+                document.getElementById('displayGiantTime').textContent = calculatedValues['Giant\'s time to ground'].value;
+                document.getElementById('displayJackTime').textContent = calculatedValues['Jack\'s TOTAL time'].value;
+            }
+            
+            // Initialize exploration display for What-If chapter
+            if (chapterNum === 7) {
+                setTimeout(() => {
+                    initializeExploration();
+                }, 500);
+            }
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        // Initialize
+        updateProgress(10);
+
+        // ========================================
+        // WHAT-IF EXPLORATION FUNCTIONALITY
+        // ========================================
+
+        let exploration = {
+            sprintSpeed: 11,      // mph
+            jogSpeed: 8,          // mph
+            distance: 100,        // meters
+            restTime: 1,          // seconds
+            chopTime: 5,          // seconds
+            giantSpeed: 3,        // m/s
+            giantDistance: 175    // meters
+        };
+
+        function mphToMs(mph) {
+            return mph * 1609.34 / 3600;
+        }
+
+        function calculateTimes() {
+            const sprintMs = mphToMs(exploration.sprintSpeed);
+            const jogMs = mphToMs(exploration.jogSpeed);
+            
+            const timeToHouse = exploration.distance / sprintMs;
+            const timeBack = exploration.distance / jogMs;
+            const jackTotal = timeToHouse + timeBack + exploration.restTime + exploration.chopTime;
+            
+            const giantTime = exploration.giantDistance / exploration.giantSpeed;
+            
+            return {
+                jackTotal: jackTotal,
+                giantTime: giantTime,
+                difference: giantTime - jackTotal,
+                sprintMs: sprintMs,
+                jogMs: jogMs
+            };
+        }
+
+        function updateExplorationDisplay() {
+            const times = calculateTimes();
+            
+            // Update time displays
+            document.getElementById('jackTimeDisplay').textContent = times.jackTotal.toFixed(2) + ' s';
+            document.getElementById('giantTimeDisplay').textContent = times.giantTime.toFixed(2) + ' s';
+            
+            const diffDisplay = document.getElementById('differenceDisplay');
+            if (times.difference > 0) {
+                diffDisplay.textContent = '+' + times.difference.toFixed(2) + ' s';
+                diffDisplay.style.color = 'var(--success-green)';
+            } else {
+                diffDisplay.textContent = times.difference.toFixed(2) + ' s';
+                diffDisplay.style.color = 'var(--warning-red)';
+            }
+            
+            // Update outcome text
+            const outcomeText = document.getElementById('outcomeText');
+            if (times.difference > 5) {
+                outcomeText.className = 'outcome-text success';
+                outcomeText.innerHTML = '✅ <strong>SUCCESS!</strong> Jack escapes easily with ' + times.difference.toFixed(2) + ' seconds to spare!';
+            } else if (times.difference > 0) {
+                outcomeText.className = 'outcome-text close';
+                outcomeText.innerHTML = '⚠️ <strong>CLOSE CALL!</strong> Jack barely makes it with only ' + times.difference.toFixed(2) + ' seconds to spare!';
+            } else {
+                outcomeText.className = 'outcome-text failure';
+                outcomeText.innerHTML = '❌ <strong>OH NO!</strong> The Giant reaches the ground ' + Math.abs(times.difference).toFixed(2) + ' seconds before Jack finishes. Jack is caught!';
+            }
+            
+            // Update progress bars
+            const jackProgress = (times.jackTotal / Math.max(times.jackTotal, times.giantTime)) * 100;
+            const giantProgress = (times.giantTime / Math.max(times.jackTotal, times.giantTime)) * 100;
+            
+            document.getElementById('jackProgressBar').style.width = jackProgress + '%';
+            document.getElementById('giantProgressBar').style.width = giantProgress + '%';
+            
+            // Check Challenge 4 (perfect timing)
+            if (Math.abs(times.difference - 1.0) < 0.1) {
+                document.getElementById('challenge4Feedback').innerHTML = 
+                    '🎯 <span style="color: var(--success-green); font-weight: bold;">PERFECT! You achieved a 1-second escape! Take a screenshot!</span>';
+            } else {
+                document.getElementById('challenge4Feedback').innerHTML = '';
+            }
+        }
+
+        // Slider event listeners
+        document.getElementById('sprintSlider').addEventListener('input', function(e) {
+            exploration.sprintSpeed = parseFloat(e.target.value);
+            const ms = mphToMs(exploration.sprintSpeed);
+            document.getElementById('sprintValue').textContent = 
+                exploration.sprintSpeed + ' mph (' + ms.toFixed(2) + ' m/s)';
+            updateExplorationDisplay();
+        });
+
+        document.getElementById('jogSlider').addEventListener('input', function(e) {
+            exploration.jogSpeed = parseFloat(e.target.value);
+            const ms = mphToMs(exploration.jogSpeed);
+            document.getElementById('jogValue').textContent = 
+                exploration.jogSpeed + ' mph (' + ms.toFixed(2) + ' m/s)';
+            updateExplorationDisplay();
+        });
+
+        document.getElementById('distanceSlider').addEventListener('input', function(e) {
+            exploration.distance = parseFloat(e.target.value);
+            document.getElementById('distanceValue').textContent = exploration.distance + ' m';
+            updateExplorationDisplay();
+        });
+
+        document.getElementById('restSlider').addEventListener('input', function(e) {
+            exploration.restTime = parseFloat(e.target.value);
+            document.getElementById('restValue').textContent = exploration.restTime + ' s';
+            updateExplorationDisplay();
+        });
+
+        document.getElementById('chopSlider').addEventListener('input', function(e) {
+            exploration.chopTime = parseFloat(e.target.value);
+            document.getElementById('chopValue').textContent = exploration.chopTime + ' s';
+            updateExplorationDisplay();
+        });
+
+        document.getElementById('giantSpeedSlider').addEventListener('input', function(e) {
+            exploration.giantSpeed = parseFloat(e.target.value);
+            document.getElementById('giantSpeedValue').textContent = exploration.giantSpeed + ' m/s';
+            updateExplorationDisplay();
+        });
+
+        function resetToOriginal() {
+            exploration = {
+                sprintSpeed: 11,
+                jogSpeed: 8,
+                distance: 100,
+                restTime: 1,
+                chopTime: 5,
+                giantSpeed: 3,
+                giantDistance: 175
+            };
+            
+            document.getElementById('sprintSlider').value = 11;
+            document.getElementById('jogSlider').value = 8;
+            document.getElementById('distanceSlider').value = 100;
+            document.getElementById('restSlider').value = 1;
+            document.getElementById('chopSlider').value = 5;
+            document.getElementById('giantSpeedSlider').value = 3;
+            
+            document.getElementById('sprintValue').textContent = '11 mph (4.92 m/s)';
+            document.getElementById('jogValue').textContent = '8 mph (3.58 m/s)';
+            document.getElementById('distanceValue').textContent = '100 m';
+            document.getElementById('restValue').textContent = '1 s';
+            document.getElementById('chopValue').textContent = '5 s';
+            document.getElementById('giantSpeedValue').textContent = '3 m/s';
+            
+            updateExplorationDisplay();
+        }
+
+        // Challenge 1: Minimum sprint speed
+        function checkChallenge1() {
+            const input = parseFloat(document.getElementById('challenge1').value);
+            const feedback = document.getElementById('challenge1Feedback');
+            
+            const minSpeed = 9.17;
+            
+            if (Math.abs(input - minSpeed) < 0.5) {
+                feedback.className = 'challenge-feedback correct';
+                feedback.innerHTML = '✓ Correct! Jack needs to sprint at least ~9.2 mph to escape!';
+                
+                // Track completion
+                if (!studentProgress.challengesCompleted.includes(1)) {
+                    studentProgress.challengesCompleted.push(1);
+                    if (currentUser) saveProgressToFirebase();
+                }
+            } else if (input < minSpeed) {
+                feedback.className = 'challenge-feedback incorrect';
+                feedback.innerHTML = '✗ Too slow! Jack would be caught at this speed. Try a higher value.';
+            } else {
+                feedback.className = 'challenge-feedback incorrect';
+                feedback.innerHTML = '✗ That works, but it\'s not the MINIMUM. Try to find the slowest speed that still lets Jack escape.';
+            }
+        }
+
+        // Challenge 2: Maximum distance
+        function checkChallenge2() {
+            const input = parseFloat(document.getElementById('challenge2').value);
+            const feedback = document.getElementById('challenge2Feedback');
+            
+            const maxDistance = 108.4;
+            
+            if (Math.abs(input - maxDistance) < 5) {
+                feedback.className = 'challenge-feedback correct';
+                feedback.innerHTML = '✓ Excellent! The house can be about ~108 meters away maximum!';
+                
+                if (!studentProgress.challengesCompleted.includes(2)) {
+                    studentProgress.challengesCompleted.push(2);
+                    if (currentUser) saveProgressToFirebase();
+                }
+            } else if (input > maxDistance + 5) {
+                feedback.className = 'challenge-feedback incorrect';
+                feedback.innerHTML = '✗ Too far! Jack wouldn\'t make it in time. Try a shorter distance.';
+            } else {
+                feedback.className = 'challenge-feedback incorrect';
+                feedback.innerHTML = '✗ That works, but it\'s not the MAXIMUM. Jack could go a bit farther!';
+            }
+        }
+
+        // Challenge 3: Maximum time budget
+        function checkChallenge3() {
+            const input = parseFloat(document.getElementById('challenge3').value);
+            const feedback = document.getElementById('challenge3Feedback');
+            
+            const maxWaste = 10.07;
+            
+            if (Math.abs(input - maxWaste) < 0.5) {
+                feedback.className = 'challenge-feedback correct';
+                feedback.innerHTML = '✓ Perfect! Jack can waste about ~10 seconds total!';
+                
+                if (!studentProgress.challengesCompleted.includes(3)) {
+                    studentProgress.challengesCompleted.push(3);
+                    if (currentUser) saveProgressToFirebase();
+                }
+            } else if (input > maxWaste + 0.5) {
+                feedback.className = 'challenge-feedback incorrect';
+                feedback.innerHTML = '✗ Too much time! Jack would be caught. Try less time.';
+            } else {
+                feedback.className = 'challenge-feedback incorrect';
+                feedback.innerHTML = '✗ That works, but Jack could waste a bit MORE time and still escape!';
+            }
+        }
+
+        // Initialize exploration display when chapter 7 is unlocked
+        function initializeExploration() {
+            updateExplorationDisplay();
+        }
     </script>
 </body>
 </html>
