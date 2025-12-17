@@ -134,7 +134,7 @@
         }
 
         h2 {
-            font-family: 'Merriweather', serif;
+            font-family: 'Inter', serif;
             font-size: 2em;
             color: var(--accent-green);
             margin-bottom: 25px;
@@ -143,7 +143,7 @@
         }
 
         h3 {
-            font-family: 'Merriweather', serif;
+            font-family: 'Inter', serif;
             font-size: 1.5em;
             color: var(--ink-medium);
             margin: 30px 0 15px;
@@ -1040,18 +1040,9 @@
                 <div class="progress-fill" id="progressBar" style="width: 0%"></div>
             </div>
         </header>
-
-        <!-- Chapter 1: Introduction & Background -->
-        <section class="chapter" id="chapter1">
-            <h2>Jack and the Beanstalk</h2>
-            <div class="story-text">
-                Once upon a time there lived a poor widow and her son Jack. One day, Jack's mother told him to sell their only cow. Jack went to the market and on the way he met a man who wanted to buy his cow. Jack asked, "What will you give me in return for my cow?" The man answered, "I will give you five magic beans!" Jack took the magic beans and gave the man the cow. But when he reached home, Jack's mother was very angry. She threw the beans out of the window. Jack was very sad and went to sleep without dinner.
-            </div>
-            <div class="story-text">
-                The next day, when Jack woke up in the morning and looked out of the window, he saw that a mile high beanstalk had grown from his magic beans! He climbed up the beanstalk and reached a kingdom in the sky where a giant and his wife lived.
-            </div>
-
-            <h3>Background Knowledge: The Physics of Motion</h3>
+ 	 	<!-- Background -->
+        <section class="chapter" id="chapter0">
+		<h3>Background Knowledge: The Physics of Motion</h3>
             <div class="formula-box">
                 <div><strong>Velocity</strong> tells us how fast something moves and in what direction.</div>
                 <div class="formula">v = x / t</div>
@@ -1062,9 +1053,9 @@
                 <div style="text-align: center; margin: 5px 0;">(displacement = velocity × time)</div>
                 <div class="formula">t = x / v</div>
                 <div style="text-align: center; margin: 5px 0;">(time = displacement ÷ velocity)</div>
-            </div>
+			</div>
 
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+		  <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <h4 style="color: var(--accent-green); margin-bottom: 10px;">Unit Conversion Reference:</h4>
                 <div style="font-family: 'Space Mono', monospace; font-size: 0.95em;">
                     <div style="margin: 8px 0;">• 1 mile = 1609.34 meters</div>
@@ -1072,6 +1063,16 @@
                     <div style="margin: 8px 0;">• To convert mph to m/s: multiply by 1609.34, then divide by 3600</div>
                 </div>
             </div>
+			
+        <!-- Chapter 1: Introduction & Background -->
+        <section class="chapter" id="chapter1">
+            <h2>Jack and the Beanstalk</h2>
+            <div class="story-text">
+                Once upon a time there lived a poor widow and her son Jack. One day, Jack's mother told him to sell their only cow. Jack went to the market and on the way he met a man who wanted to buy his cow. Jack asked, "What will you give me in return for my cow?" The man answered, "I will give you five magic beans!" Jack took the magic beans and gave the man the cow. But when he reached home, Jack's mother was very angry. She threw the beans out of the window. Jack was very sad and went to sleep without dinner.
+            </div>
+            <div class="story-text">
+                The next day, when Jack woke up in the morning and looked out of the window, he saw that a mile high beanstalk had grown from his magic beans! He climbed up the beanstalk and reached a kingdom in the sky where a giant and his wife lived.
+            </div>    
 
             <button onclick="unlockChapter(2)">Continue to the Escape →</button>
         </section>
